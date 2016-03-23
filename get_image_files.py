@@ -1,10 +1,9 @@
 from apiclient.discovery import build
+import json
 import os
-from pprint import pprint
-import concurrent.futures
-import urllib.request
+from image_grabber import ImageGrabber
 
-def get_image_urls(search_term):
+def image_urls_api_call(search_term):
     try:
         key = os.environ['GOOGLE_CUSTOM_SEARCH_KEY']
         service = build("customsearch", "v1",
@@ -27,23 +26,27 @@ def get_image_urls(search_term):
         return []
 
 
-def get_img(url, local_path):
+def update_image_urls(celebs_list):
     try:
-        url, path = urllib.request.urlretrieve(url, local_path)
-        return url, path
+        with open('work/celeb_image_urls.json', 'r') as f:
+            old_celebs_urls_dict = json.load(f)
     except:
-        print("Failed to download and save image: " + url)
+        old_celebs_urls_dict = {}
 
+    # Avoid calling google search API on names we've called it on before due to API limit
+    new_celeb_urls_dict = {name: image_urls_api_call(name) for name in celebs_list if
+                                                name not in old_celebs_urls_dict.keys()}
+    # handle failed api calls
+    new_celeb_urls_dict = {k: v for k, v in new_celeb_urls_dict.items() if len(v)>0}
+    new_celeb_urls_dict.update(old_celebs_urls_dict)
+    with open('work/celeb_image_urls.json', 'w') as f:
+        json.dump(new_celeb_urls_dict, f)
+    return new_celeb_urls_dict
 
 if __name__ == "__main__":
     with open('celebs_list.txt', 'r') as celebs_file:
         celebs_list = [line.strip('\n') for line in celebs_file]
-    for name in celebs_list:
-        # OUGHT TO STORE LIST OF fname-URL pairs... these already come back from call to get_img
-        name_for_path = name.replace(" ", "_").casefold()
-        os.mkdir('work/' + name_for_path)
-        image_urls = get_image_urls(name)
-        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as e:
-            for i, url in enumerate(image_urls):
-                local_path = os.path.join('.', 'work', name_for_path, str(i)+".jpg")
-                e.submit(get_img, url, local_path)
+    celeb_urls_dict = update_image_urls(celebs_list)
+    with ImageGrabber(celeb_urls_dict) as g:
+        g.run()
+        g.try_again_on_failed_images()
