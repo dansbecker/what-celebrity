@@ -4,6 +4,7 @@ import os
 from image_grabber import ImageGrabber
 
 def image_urls_api_call(search_term):
+    """returns list of image urls (with faces) from google image search on search_term"""
     try:
         key = os.environ['GOOGLE_CUSTOM_SEARCH_KEY']
         service = build("customsearch", "v1",
@@ -27,6 +28,10 @@ def image_urls_api_call(search_term):
 
 
 def update_image_urls(celebs_list):
+    """
+    Reads celeb_image_urls.json and adds urls for celebrities that don't have them
+    This is necessary because API call limits are too tight to fill this file in one day
+    """
     try:
         with open('work/celeb_image_urls.json', 'r') as f:
             old_celebs_urls_dict = json.load(f)

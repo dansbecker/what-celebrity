@@ -2,11 +2,12 @@ import json
 import os
 import concurrent.futures
 import urllib.request
+from os.path import join, exists
 
 class ImageGrabber(object):
     def __init__(self, celeb_urls_dict):
         self.celeb_urls_dict = celeb_urls_dict
-        self._failed_to_capture_path = os.path.join('work', 'failed_to_capture.json')
+        self._failed_to_capture_path = join('work', 'failed_to_capture.json')
 
     def __enter__(self):
         try:
@@ -26,8 +27,8 @@ class ImageGrabber(object):
 
     def _make_target_dir(self, celeb_name):
         name_for_path = celeb_name.replace(" ", "_").casefold()
-        path = os.path.join('work', name_for_path)
-        if not os.path.exists(path):
+        path = join('work', name_for_path)
+        if not exists(path):
             os.mkdir(path)
         return path
 
@@ -39,7 +40,7 @@ class ImageGrabber(object):
 
     def _get_file_path(self, url, search_term):
         search_term_dir = self._make_target_dir(search_term)
-        local_img_path = os.path.join(search_term_dir, self._url_to_fname(url)+".jpg")
+        local_img_path = join(search_term_dir, self._url_to_fname(url)+".jpg")
         return local_img_path
 
     def run(self):
@@ -47,11 +48,11 @@ class ImageGrabber(object):
             for search_term, url_list in self.celeb_urls_dict.items():
                 local_img_paths = [self._get_file_path(url, search_term) for url in url_list]
                 for url, local_img_path in zip(url_list, local_img_paths):
-                    if not os.path.exists(local_img_path):
+                    if not exists(local_img_path):
                         worker_pool.submit(self._get_img(url, local_img_path, search_term))
 
     def try_again_on_failed_images(self):
-        # Should be few enough images here that concurrency is unimportant
+        # Should be few enough images that concurrency is unimportant
         for url, search_term in self.failed_to_capture:
             local_img_path = self._get_file_path(url, search_term)
             try:
