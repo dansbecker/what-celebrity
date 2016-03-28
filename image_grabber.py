@@ -50,13 +50,3 @@ class ImageGrabber(object):
                 for url, local_img_path in zip(url_list, local_img_paths):
                     if not exists(local_img_path):
                         worker_pool.submit(self._get_img(url, local_img_path, search_term))
-
-    def try_again_on_failed_images(self):
-        # Should be few enough images that concurrency is unimportant
-        for url, search_term in self.failed_to_capture:
-            local_img_path = self._get_file_path(url, search_term)
-            try:
-                self._get_img(url, local_img_path, search_term)
-                self.failed_to_capture.remove([url, search_term])
-            except:
-                pass

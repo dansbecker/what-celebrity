@@ -54,4 +54,3 @@ if __name__ == "__main__":
     celeb_urls_dict = update_image_urls(celebs_list)
     with ImageGrabber(celeb_urls_dict) as g:
         g.run()
-        g.try_again_on_failed_images()

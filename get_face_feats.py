@@ -55,17 +55,27 @@ def get_all_face_feats():
     stores list of images that could not be captured in failed_to_featurize.json
     """
 
-    feats_data = []
-    failed_to_featurize = []
-    indicoio.config.api_key = os.environ['INDICIO_API_KEY']
+    facial_feats_path = join("work", "facial_feats_data.json")
+    failed_to_featurize_path = join("work", "failed_to_featurize.json")
+    try:
+        with open(facial_feats_path, 'r') as f:
+            feats_data = json.load(f)
+    except:
+        feats_data = []
+    try:
+        with open(failed_to_featurize_path, 'r') as f:
+            failed_to_featurize = json.load(f)
+    except:
+        failed_to_featurize = []
+
+    indicoio.config.api_key = os.environ['INDICO_API_KEY']
 
     celeb_dirs = [d for d in os.listdir('work')
                       if os.path.isdir(join('work', d))]
-    for celeb in celeb_dirs:
-        # to simplify error handling, not submitting to API in batches
-        for fname in os.listdir(join('work', celeb)):
-            img_path = join('work', celeb, fname)
-            with concurrent.futures.ThreadPoolExecutor(max_workers=16) as worker_pool:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=16) as worker_pool:
+        for celeb in celeb_dirs:
+            for fname in os.listdir(join('work', celeb)):
+                img_path = join('work', celeb, fname)
                 worker_pool.submit(add_single_face_data,
                                    celeb, img_path, feats_data, failed_to_featurize)
     with open('work/facial_feats_data.json', 'w') as f:
