@@ -34,7 +34,7 @@ def get_single_face_features(img):
 
 def add_single_face_data(celeb, img_path, feats_data, failed_to_featurize):
     """
-    Add data for single face image to the feats_data iterable.
+    Append data for single face image to the feats_data iterable.
     This function mutates the iterable, and returns nothing.
     Added information is a dictionary with celeb name, face_feats, face_corners and img_path
     """
@@ -63,7 +63,7 @@ def get_all_face_feats():
                       if os.path.isdir(join('work', d))]
     for celeb in celeb_dirs:
         # to simplify error handling, not submitting to API in batches
-        for fname in os.listdir(join('work', celeb))[:3]:
+        for fname in os.listdir(join('work', celeb)):
             img_path = join('work', celeb, fname)
             with concurrent.futures.ThreadPoolExecutor(max_workers=16) as worker_pool:
                 worker_pool.submit(add_single_face_data,
