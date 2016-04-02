@@ -61,3 +61,6 @@ target/
 #Ipython Notebook
 .ipynb_checkpoints
 work/*
+
+backup_api_key.txt
+*.bak

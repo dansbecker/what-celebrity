@@ -24,15 +24,14 @@ def image_urls_api_call(search_term, previously_captured_num):
 
         res = service.cse().list(
                                 q=search_term,
-                                cx='017560911483415735967:xx4esjwh_qu', # my custom search engine id. Just google
+                                cx='017560911483415735967:xx4esjwh_qu', # my custom search engine id.
                                 searchType='image',
                                 filter='1',
                                 num=10,
                                 imgSize="medium",
                                 imgType="face",
                                 fileType="jpg",
-                                lowRange=previously_captured_num+1,
-                                highRange=previously_captured_num+11
+                                start = previously_captured_num
                                 ).execute()
 
         links = [item['link'] for item in res['items']]
@@ -65,7 +64,8 @@ def update_image_urls(celebs_list):
         img_count = len(urls[name])
         if img_count < min_link_count + new_links_per_api_call:
             try:
-                urls[name] = urls[name] + image_urls_api_call(name, img_count)
+                def dedup(l): return list(set(l))
+                urls[name] = dedup(urls[name] + image_urls_api_call(name, img_count))
             except:     # api call fails if hit daily usage limit
                 pass
 
