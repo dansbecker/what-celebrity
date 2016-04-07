@@ -24,7 +24,7 @@ def image_urls_api_call(search_term, previously_captured_num):
 
         res = service.cse().list(
                                 q=search_term,
-                                cx='017560911483415735967:xx4esjwh_qu', # my custom search engine id.
+                                cx='018267786259991380019:ja65luoszbg', # my custom search engine id.
                                 searchType='image',
                                 filter='1',
                                 num=10,
@@ -56,18 +56,19 @@ def update_image_urls(celebs_list):
     except:
         urls = {}
 
-    min_link_count = min((len(urls[name]) for name in urls))
 
+    min_link_count = min((len(urls[name]) for name in urls))
     for name in celebs_list:
         if name not in urls:
             urls[name] = []
         img_count = len(urls[name])
-        if img_count < min_link_count + new_links_per_api_call:
+        if img_count < min_link_count + new_links_per_api_call + 1:
             try:
                 def dedup(l): return list(set(l))
                 urls[name] = dedup(urls[name] + image_urls_api_call(name, img_count))
             except:     # api call fails if hit daily usage limit
                 pass
+
 
     with open('work/celeb_image_urls.json', 'w') as f:
         json.dump(urls, f)

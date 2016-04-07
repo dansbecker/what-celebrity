@@ -91,6 +91,7 @@ class FacialFeatsGrabber(Grabber):
                                         'local_img_path': local_img_path
                                         })
         except:
+            print('failed to grab facial feats for ' + local_img_path)
             self.failed_to_capture.append((local_img_path, search_term))
 
     def _get_single_face_corners(self, img):
