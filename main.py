@@ -15,7 +15,7 @@ def show_box_on_face(img, face_corners, outpath, box_color="orange"):
     dr.rectangle(xy=face_corners, outline=box_color)
     img.save(outpath)
 
-def image_urls_api_call(search_term, previously_captured_num):
+def image_urls_api_call(search_term, previously_captured_num, imgSize="medium"):
     """returns list of image urls (with faces) from google image search on search_term"""
     try:
         key = os.environ['GOOGLE_CUSTOM_SEARCH_KEY']
@@ -28,7 +28,7 @@ def image_urls_api_call(search_term, previously_captured_num):
                                 searchType='image',
                                 filter='1',
                                 num=10,
-                                imgSize="medium",
+                                imgSize=imgSize,
                                 imgType="face",
                                 fileType="jpg",
                                 start = previously_captured_num
