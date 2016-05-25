@@ -43,4 +43,4 @@ def make_training_thumbnails(img_df, horiz_pad_frac=0.05, vert_pad_frac=0.1,
 
 if __name__ == "__main__":
     img_df = pd.read_csv('work/image_and_face_dims.csv')
-    make_training_thumbnails(img_df, 0.05, 0.20)
+    make_training_thumbnails(img_df, 0.05, 0.20, 60)
